@@ -26,11 +26,11 @@ input_file = args[2]
 outdir = args[3]
 outfile = args[4]
 ranking_column = args[5]
-id_type = args[6]
 
 # If optional parameters are provided, set up gene id format translation
-if(length(args) > 6){
+if(length(args) > 5){
   
+  id_type = args[6]
   target_id_type = args[7]
   species = args[8]
   id_translation = TRUE
@@ -59,14 +59,17 @@ for(i in 1:length(args)){
 # library(biomaRt)
 
 # Function definition
-getRNK <- function(input_table, outdir, filename){
+getRNK <- function(input_table, outdir, filename, ranking_column){
   
   rnk <- input_table %>%
     tibble::rownames_to_column("gene_id") %>% 
     dplyr::distinct(gene_id, .keep_all = T) %>%
-    dplyr::mutate(stat = ifelse(is.na(padj), 0, stat)) %>%  # Even with a large absolute statistic, those genes with a lot of variability (e.g. caused by an outlier) should be corrected to 0
-    dplyr::select(c("gene_id", ranking_column)) %>% 
-    dplyr::arrange_at(ranking_column)
+    dplyr::rename(ranking_column = ranking_column) %>% 
+    dplyr::mutate(ranking_column = ifelse(is.na(padj), 0, ranking_column)) %>%  # Even with a large absolute statistic, those genes with a lot of variability (e.g. caused by an outlier) should be corrected to 0
+    dplyr::select(c("gene_id", "ranking_column")) %>% 
+    dplyr::arrange_at("ranking_column")
+  
+  names(rnk)[2] <- ranking_column
   
   write.table(x = rnk, file = paste0(outdir, "/", filename), sep = "\t", row.names = F, col.names = F)
   
@@ -81,8 +84,12 @@ if(input_format == "dds"){
 
   }else if(input_format == "table"){
     
-    # Read file, format with first column as row names
-    res_input <- data.table::fread(input_file)
+    # Read file, format with first column as row names. 
+    # Remove duplicate genes. Remove NA
+    res_input <- data.table::fread(input_file) %>% 
+      dplyr::distinct_at(1, .keep_all = TRUE) %>% 
+      dplyr::filter(!is.na(.[[1]]))
+    
     gene_ids_temp <- res_input %>% dplyr::pull(1)
     res_input <- res_input %>% dplyr::select(-1)
     rownames(res_input) <- gene_ids_temp
@@ -118,4 +125,4 @@ if(id_translation){
     dplyr::select(-1)  # Remove old identifiers
 }
 
-getRNK(input_table = res_input, outdir = outdir, filename = outfile)
+getRNK(input_table = res_input, outdir = outdir, filename = outfile, ranking_column = ranking_column)

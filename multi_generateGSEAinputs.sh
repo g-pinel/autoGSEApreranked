@@ -104,8 +104,7 @@ if test -z "$id_translation_file"; then
             ${input_file_list[0]} \
             $outdir \
             ${outfile_list[0]} \
-            $ranking_column \
-            $id_type
+            $ranking_column
     fi
 
     echo "Running the rest of files..."
@@ -139,8 +138,7 @@ if test -z "$id_translation_file"; then
                 ${input_file_list[i]} \
                 $outdir \
                 ${outfile_list[i]} \
-                $ranking_column \
-                $id_type
+                $ranking_column
         done
     fi
 
