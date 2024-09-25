@@ -42,9 +42,9 @@ shift "$(($OPTIND -1))"
 # Some gene sets (e.g. KEGG) contain slashes, which cause errors when creating output
 # Get gene set file extension
 
-geneset_extension=$(basename $geneset | cut -d "." -f 2)
+geneset_extension=$(basename $geneset | rev | cut -d "." -f 1 | rev)
 
-sed -i -e 's/\//-/g' $geneset > $outdir/processed_geneset.$geneset_extension
+sed 's/\//-/g' $geneset > $outdir/processed_geneset.$geneset_extension
 
 # Exclude .rnk files inside edb/ folders, which are result folders
 rnk_list=( $(find $input_dir -name "*.rnk" | grep -wv "edb") )
@@ -64,7 +64,7 @@ for((i=0;i<$n_comparisons;i++)); do
 done
 
 echo -e "\nParameters file generated correctly, starting GSEA runs..."
-n_lines=$(wc -l < gsea_parameters.csv)
+n_lines=$(wc -l < $outdir/gsea_parameters.csv)
 n_runs=$(($n_lines-1))
 echo "$n_runs GSEA preranked runs will be processed"
 

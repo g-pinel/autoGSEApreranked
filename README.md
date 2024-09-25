@@ -9,7 +9,7 @@ The *runPrerankedGSEA.sh* script allows you to run preranked GSEA using all RNK 
 --inputdir or -i: the directory containing the RNK files (recursive search, will return RNK files in subdirectories too).  
 --geneset or -s: path to a gene set file in GMX or GMT format.  
 --outdir or -o: path to the output folder where results will be saved.  
---gsea or -x: path to the *gsea.sh* script, included in GSEA desktop, available at https://www.gsea-msigdb.org/gsea/downloads.jsp  
+--gsea or -x: path to the *gsea-cli.sh* script, included in GSEA desktop, available at https://www.gsea-msigdb.org/gsea/downloads.jsp  
 
 Within the output directory, results folder named after their corresponding RNK file will be created. In addition, a CSV file summarising the RNK file, gene set file, analysis name and output directory for each run will be generated.  
 The gene identifier format in RNK files needs to match that of the gene set file.

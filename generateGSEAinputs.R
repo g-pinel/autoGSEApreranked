@@ -62,12 +62,14 @@ for(i in 1:length(args)){
 getRNK <- function(input_table, outdir, filename, ranking_column){
   
   rnk <- input_table %>%
-    tibble::rownames_to_column("gene_id") %>% 
+    tibble::rownames_to_column("gene_id") %>%
+    dplyr::filter(gene_id != "") %>% 
     dplyr::distinct(gene_id, .keep_all = T) %>%
     dplyr::rename(ranking_column = ranking_column) %>% 
     dplyr::mutate(ranking_column = ifelse(is.na(padj), 0, ranking_column)) %>%  # Even with a large absolute statistic, those genes with a lot of variability (e.g. caused by an outlier) should be corrected to 0
     dplyr::select(c("gene_id", "ranking_column")) %>% 
     dplyr::arrange_at("ranking_column")
+    
   
   names(rnk)[2] <- ranking_column
   
